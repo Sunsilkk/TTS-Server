@@ -1,0 +1,42 @@
+[project]
+authors = [{ name = "Sunsilkk", email = "duongttt8@gmail.com" }]
+dependencies = [
+    "huggingface-hub>=0.23.5,<0.24",
+    "tokenizers>=0.20.1,<0.21",
+    "phonemizer>=3.3.0,<4",
+]
+description = "Add a short description here"
+name = "tts-server"
+requires-python = "<3.13"
+version = "0.1.0"
+
+[build-system]
+build-backend = "hatchling.build"
+requires = ["hatchling"]
+
+[tool.pixi.project]
+channels = ["conda-forge", "pytorch"]
+platforms = ["linux-64"]
+
+[tool.pixi.pypi-dependencies]
+tts_server = { path = ".", editable = true }
+styletts2 = { git = "https://github.com/lxe/styletts2.git" }
+monotonic-align = { git = "https://github.com/resemble-ai/monotonic_align.git" }
+
+[tool.pixi.tasks]
+
+[tool.pixi.dependencies]
+llvmlite = ">=0.43.0,<0.44"
+numba = ">=0.60.0,<0.61"
+filelock = ">=3.13.4,<4"
+cached_path = ">=1.6.3,<2"
+pytorch = ">=2.4.1,<3"
+torchaudio = ">=2.4.1,<3"
+flask = ">=3.0.3,<4"
+protobuf = ">=5.27.5,<6"
+flask-socketio = ">=5.3.6,<6"
+flask_cors = ">=4.0.0,<5"
+eventlet = ">=0.37.0,<0.38"
+urllib3 = ">=2.2.3,<3"
+requests = ">=2.32.3,<3"
+pyaudio = ">=0.2.14,<0.3"
