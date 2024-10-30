@@ -1,3 +1,0 @@
-flask
-soundfile
-git+https://github.com/lxe/styletts2.git
