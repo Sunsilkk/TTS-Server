@@ -36,7 +36,7 @@ Replace `your_script.py` with the name of the script you want to run. This comma
 
 ### Installing a New Package
 
-1. **Search on [prefex.dev](https://prefex.dev)**:
+1. **Search on [prefix.dev](https://prefix.dev)**:
    - If the package is available, install it using:
      ```bash
      pixi add {package_name}
