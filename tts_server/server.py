@@ -9,7 +9,6 @@ from styletts2 import TTS
 import subprocess
 import traceback
 import random
-import time
 
 app = Flask(__name__)
 fdir = os.path.dirname(__file__)
@@ -49,7 +48,6 @@ class HotProcessQueue:
         stdout, stderr = process.communicate(input=input_string.encode())
         process.terminate()
 
-        # Spawn a new process asynchronously
         threading.Thread(target=self.spawn_new_process).start()
 
         return stdout.decode()
