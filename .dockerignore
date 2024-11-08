@@ -1,0 +1,9 @@
+README.md
+.gitignore
+.docker
+.dockerignore
+.envrc
+.gitattributes
+pyrightconfig.json
+.pixi
+.venv

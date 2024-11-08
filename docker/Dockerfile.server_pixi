@@ -1,0 +1,57 @@
+# syntax=docker/dockerfile:1
+ARG PIXI_ENVIRONMENT=pytorch
+
+FROM ghcr.io/prefix-dev/pixi:0.34.0-bookworm  AS build
+ARG PIXI_ENVIRONMENT=pytorch
+ENV PIXI_ENVIRONMENT=${PIXI_ENVIRONMENT}
+
+# copy source code, pixi.toml and pixi.lock to the container
+WORKDIR /app
+# COPY --from=git /app .
+COPY . .
+# COPY ./docker/styletts2/pyproject.toml ./docker/styletts2/pixi.lock ./
+
+# install dependencies to `/app/.pixi/envs/prod`
+# use `--locked` to ensure the lockfile is up to date with pixi.toml
+RUN apt-get update && \
+    apt-get install --no-install-suggests --no-install-recommends --yes \
+    git \
+    # ca-certificates \
+    build-essential \
+    libssl-dev \
+    libffi-dev \
+    # wget \
+    # curl \
+    gcc \
+    g++
+
+RUN pixi install --locked -e ${PIXI_ENVIRONMENT}
+
+# Copy the virtualenv into a distroless image
+# FROM gcr.io/distroless/base-debian12 AS production
+# ARG PIXI_ENVIRONMENT=pytorch
+# ENV PIXI_ENVIRONMENT=${PIXI_ENVIRONMENT}
+
+# Prevents Python from writing pyc files.
+ENV PYTHONDONTWRITEBYTECODE=1
+
+# Keeps Python from buffering stdout and stderr to avoid situations where
+# the application crashes without emitting any logs due to buffering.
+ENV PYTHONUNBUFFERED=1
+
+# only copy the production environment into prod container
+# please note that the "prefix" (path) needs to stay the same as in the build container
+# COPY --from=build /app/.pixi/envs/${PIXI_ENVIRONMENT} /home/nonroot/.pixi/envs/${PIXI_ENVIRONMENT}
+# copy your project code into the container as well
+# COPY --from=git /app .
+
+# # from pixi shell-hook -e prod
+# ENV PATH=/home/nonroot/.pixi/envs/${PIXI_ENVIRONMENT}/bin:$PATH
+# ENV CONDA_PREFIX=/home/nonroot/.pixi/envs/${PIXI_ENVIRONMENT}
+
+ENV PATH=/app/.pixi/envs/${PIXI_ENVIRONMENT}/bin:$PATH
+ENV CONDA_PREFIX=/app/.pixi/envs/${PIXI_ENVIRONMENT}
+
+
+# run your app inside the pixi environment
+CMD [ "pixi", "run", "-e", "pytorch-cuda", "python", "-m", "tts_server.server" ]

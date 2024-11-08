@@ -10,6 +10,10 @@ import subprocess
 import traceback
 import random
 
+import nltk
+
+nltk.download("punkt_tab")
+
 app = Flask(__name__)
 fdir = os.path.dirname(__file__)
 
@@ -264,7 +268,7 @@ def main():
 
     parser.add_argument("--debug", action="store_true", help="Enable debug mode")
     parser.add_argument(
-        "--host", default="127.0.0.1", help="Host IP address (default: 127.0.0.1)"
+        "--host", default="127.0.0.1", help="Host IP address (default: 0.0.0.0)"
     )
     parser.add_argument(
         "--port", type=int, default=5050, help="Port number (default: 5050)"

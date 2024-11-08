@@ -116,3 +116,4 @@ curl -X POST -H "Content-Type: application/json" -H "Accept: audio/wav" \
 This command sends a request to the TTS server, generating audio from the given text. The resulting audio is then played using `aplay`.
 
 Happy coding with Sunsilkk! 🚀
+# TTS-Server

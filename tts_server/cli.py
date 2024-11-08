@@ -22,7 +22,7 @@ def play_audio():
         wav = audio_queue.get()
         if wav is None:
             break
-        sd.play(wav, 24000)
+        sd.play(wav, sample_rate=24000)
         sd.wait()
 
 def signal_handler(signal, frame):

@@ -1,0 +1,67 @@
+
+# Main build stage
+FROM docker.io/pytorch/pytorch:2.5.1-cuda12.1-cudnn9-runtime AS build
+
+# Build arguments
+ARG UID=10001
+ARG USER=nonroot
+ARG APP_HOME=/app
+ARG APP_PORT=5050
+
+# Environment variables
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PATH="/app/.local/bin:$PATH" \
+    PYTHONPATH="/app:$PYTHONPATH" \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1
+
+# Install system dependencies
+RUN apt-get update \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+    curl \
+    gcc \
+    git \
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean
+
+# Create non-root user and set up directories
+RUN adduser \
+    --disabled-password \
+    --gecos "" \
+    --home "/home/${USER}" \
+    --shell "/sbin/nologin" \
+    --uid "${UID}" \
+    ${USER} \
+    && mkdir -p /home/${USER}/.cache ${APP_HOME}/voices \
+    && chown -R ${USER}:${USER} /home/${USER}/.cache ${APP_HOME}
+
+WORKDIR ${APP_HOME}
+
+# Copy application code
+COPY --chown=${USER}:${USER} . ${APP_HOME}/
+
+# Install Python dependencies
+RUN pip install --no-cache-dir uv \
+    && CONDA_PREFIX=/opt/conda uv pip install --no-cache -r requirements.txt
+
+# Switch to non-root user
+USER ${USER}
+
+# Add health check
+HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:${APP_PORT}/health || exit 1
+
+# Set GPU configurations
+ENV NVIDIA_VISIBLE_DEVICES=none \
+    NVIDIA_DRIVER_CAPABILITIES=compute,utility
+
+# Expose port
+EXPOSE ${APP_PORT}
+
+# Set volume mount point
+VOLUME ["/app/voices"]
+
+# Set entrypoint and default command
+ENTRYPOINT ["python"]
+CMD ["-m", "tts_server.server"]
