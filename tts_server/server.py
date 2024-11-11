@@ -268,10 +268,10 @@ def main():
 
     parser.add_argument("--debug", action="store_true", help="Enable debug mode")
     parser.add_argument(
-        "--host", default="127.0.0.1", help="Host IP address (default: 0.0.0.0)"
+        "--host", default="0.0.0.0", help="Host IP address (default: 0.0.0.0)"
     )
     parser.add_argument(
-        "--port", type=int, default=5050, help="Port number (default: 5050)"
+        "--port", type=int, default=5051, help="Port number (default: 5050)"
     )
 
     args = parser.parse_args()

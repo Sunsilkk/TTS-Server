@@ -1,8 +1,8 @@
 # syntax=docker/dockerfile:1
-ARG PIXI_ENVIRONMENT=pytorch
+ARG PIXI_ENVIRONMENT=pytorch-cuda
 
-FROM ghcr.io/prefix-dev/pixi:0.34.0-bookworm  AS build
-ARG PIXI_ENVIRONMENT=pytorch
+FROM ghcr.io/prefix-dev/pixi:0.34.0-jammy-cuda-12.2.2 AS build
+ARG PIXI_ENVIRONMENT=pytorch-cuda
 ENV PIXI_ENVIRONMENT=${PIXI_ENVIRONMENT}
 
 # copy source code, pixi.toml and pixi.lock to the container
@@ -51,7 +51,6 @@ ENV PYTHONUNBUFFERED=1
 
 ENV PATH=/app/.pixi/envs/${PIXI_ENVIRONMENT}/bin:$PATH
 ENV CONDA_PREFIX=/app/.pixi/envs/${PIXI_ENVIRONMENT}
-
 
 # run your app inside the pixi environment
 CMD [ "pixi", "run", "-e", "pytorch-cuda", "python", "-m", "tts_server.server" ]

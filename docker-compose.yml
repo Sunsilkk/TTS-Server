@@ -1,44 +1,28 @@
-version: "3.8"
-
-x-logging: &default-logging
-  options:
-    max-size: "10m"
-    max-file: "3"
-  driver: json-file
-
 services:
   api:
     build:
       context: .
       dockerfile: docker/Dockerfile.server
-      args:
-        - UID=${UID:-10001}
     image: "harbor.cybertech.com.vn/livekit-dev-duong/apiserver-tts-custom:v1"
-    restart: unless-stopped
+    restart: always
     ports:
-      - "${API_PORT:-5050}:5050"
+      - "5050:5050"
     volumes:
-      - ./voices:/app/voices:ro
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:5050/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
-    deploy:
-      resources:
-        limits:
-          cpus: "2.0"
-          memory: 4G
-        reservations:
-          cpus: "0.5"
-          memory: 1G
-    logging: *default-logging
+      - ./voices:/home/nonroot/tts_server/voices
 
-networks:
-  default:
-    driver: bridge
-    ipam:
-      driver: default
-      config:
-        - subnet: 172.28.0.0/16
+  agent:
+    build:
+      context: .
+      dockerfile: docker/styletts2/Dockerfile.agent
+    image: "harbor.cybertech.com.vn/livekit-dev-duong/livekit-agent:v1"
+    restart: always
+    ports:
+      - "7880:7880"
+      - "7881:7881"
+      - "7882:7882/udp"
+    env_file:
+      - .env
+    environment:
+      - STYLETTS2_API_URL=http://api:5050
+    depends_on:
+      - styletts2-service
